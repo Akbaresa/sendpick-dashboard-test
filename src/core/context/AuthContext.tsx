@@ -92,28 +92,31 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const checkToken = async () => {
-    if (!token) {
-      setUser(null);
-      console.log("token tidak ditemukan");
-    }
+    try {
+      if (!token) {
+        setUser(null);
+        console.log("token tidak ditemukan");
+      }
 
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/me`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/me`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-    const data = await res.json();
-    if (!res.ok) {
-      setUser(null);
+      const data = await res.json();
+      console.log(data)
+      if (!res.ok) {
+        setUser(null);
+        router.push("/login");
+      }
+      setUser(data.data);
+      return data.data;
+    }catch(e){
       router.push("/login");
-      console.log("cek token gagal,token tidak ditemukan");
-
     }
-    setUser(data.data);
-    return data.data;
   };
 
   const logout = () => {
