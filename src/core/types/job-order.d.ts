@@ -21,3 +21,19 @@ export interface JobOrderResponse {
     prev_page_url: string | null;
   };
 }
+
+export interface JobOrderDetail {
+  id_job_order: number;
+  job_number: string;
+  customer_name: string;
+  status_name: string;
+  driver_name: string;
+  driver_phone?: string;
+  vehicle_plate?: string;
+  vehicle_name?: string;
+  pickup_location?: string;
+  dropoff_location?: string;
+  total_weight?: number;
+  total_volume?: number;
+  created_at: string;
+}
