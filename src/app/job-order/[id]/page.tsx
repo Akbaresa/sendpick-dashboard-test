@@ -8,17 +8,20 @@ import { IconReload } from "@tabler/icons-react";
 import { getJobOrderDetail } from "@/core/service/job-order";
 import { fetchDistanceAndCost } from "@/core/service/distance-cost";
 import { JobOrderDetail } from "@/core/types/job-order";
+import Link from "next/link";
 
 export default function JobOrderDetailPage() {
   const { id } = useParams();
   const [job, setJob] = useState<JobOrderDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedLoc, setSelectedLoc] = useState<unknown | null | any>(null);
-
-  // Tambahan state untuk Distance & Cost
+  const [openMapId, setOpenMapId] = useState<number | null>(null);
   const [distanceData, setDistanceData] = useState<any | null>(null);
   const [loadingDistance, setLoadingDistance] = useState(false);
+
+  const handleToggleMap = (id: number) => {
+    setOpenMapId(openMapId === id ? null : id);
+  };
 
   useEffect(() => {
     if (!id) return;
@@ -33,7 +36,7 @@ export default function JobOrderDetailPage() {
         const res = await getJobOrderDetail(decryptedId);
         setJob(res);
 
-        // Setelah detail job diambil, fetch juga jarak & ongkir
+
         setLoadingDistance(true);
         const distanceResult = await fetchDistanceAndCost(decryptedId);
         setDistanceData(distanceResult);
@@ -52,11 +55,29 @@ export default function JobOrderDetailPage() {
     <AdminLayout>
       <div className="pc-container content-page">
         <div className="pc-content">
+          <div className="page-header">
+            <div className="page-block">
+              <div className="row align-items-center">
+                <div className="col-md-12">
+                  <ul className="breadcrumb">
+                    <li className="breadcrumb-item"><a>Home</a></li>
+                    <li className="breadcrumb-item" aria-current="page"><Link href={`/job-order`}>Job Order</Link></li>
+                  </ul>
+                </div>
+                <div className="col-md-12">
+                  <div className="page-header-title">
+                    <h2 className="mb-0">Job Order</h2>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div className="card">
             <div className="card-header">
               <h5>Job Order Detail</h5>
             </div>
-            <div className="card-body position-relative">
+            <div className="card-body position-relative" style={{ overflow: "visible" }}>
               {(loading || loadingDistance) && (
                 <div className="loading-overlay d-flex flex-column align-items-center justify-content-center">
                   <IconReload size={36} className="spin mb-2" />
@@ -82,7 +103,123 @@ export default function JobOrderDetailPage() {
                     <p><strong>Created At:</strong> {new Date(job.job_order.created_at).toLocaleString()}</p>
                   </div>
 
-                  {/* Distance & Cost Section */}
+                  {/* Location Timeline */}
+                  <div className="location-timeline-container mt-4">
+                    <h6>📍 Location Timeline</h6>
+
+                    {job.locations.length > 0 ? (
+                      <div className="timeline">
+                        {job.locations.map((loc: any, index: number) => (
+                          <div className="timeline-item" key={loc.id_location}>
+                            <div className="timeline-icon">
+                              {index === 0
+                                ? "🚚"
+                                : index === job.locations.length - 1
+                                  ? "🏁"
+                                  : "📦"}
+                            </div>
+
+                            <div className="timeline-content">
+                              <h6 className="mb-1">{loc.type}</h6>
+                              <p className="mb-1 text-muted">{loc.address}</p>
+                              <p className="mb-1">
+                                <strong>Lat:</strong> {loc.lat ?? "-"} |{" "}
+                                <strong>Lng:</strong> {loc.lng ?? "-"}
+                              </p>
+
+                              {loc.lat && loc.lng ? (
+                                <button
+                                  onClick={() => handleToggleMap(loc.id_location)}
+                                  className="btn btn-sm btn-outline-primary mt-2"
+                                >
+                                  {openMapId === loc.id_location
+                                    ? "Hide Map"
+                                    : "Track via Map"}
+                                </button>
+                              ) : (
+                                <span className="text-muted mt-2 d-block">
+                                  No coordinates
+                                </span>
+                              )}
+
+                              <div
+                                className={`map-container mt-3 position-relative ${openMapId === loc.id_location ? "show" : ""
+                                  }`}
+                              >
+                                {openMapId === loc.id_location && (
+                                  <div
+                                    className="map-embed card position-absolute start-0 end-0"
+                                    style={{
+                                      top: "100%",
+                                      zIndex: 1000,
+                                      marginTop: "10px",
+                                      boxShadow: "0 6px 20px rgba(0,0,0,0.15)",
+                                      borderRadius: "12px",
+                                      overflow: "hidden",
+                                    }}
+                                  >
+                                    <div className="card-body p-0">
+                                      <iframe
+                                        src={`https://www.google.com/maps?q=${loc.lat},${loc.lng}&z=14&output=embed`}
+                                        width="100%"
+                                        height="250"
+                                        style={{
+                                          border: 0,
+                                          display: "block",
+                                          borderRadius: "12px",
+                                        }}
+                                        allowFullScreen
+                                        loading="lazy"
+                                      ></iframe>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+
+
+
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-muted">No locations found.</p>
+                    )}
+                  </div>
+
+                  <hr />
+
+                  <div className="mb-4">
+                    <h6>📋 Manifests</h6>
+                    {job.manifests.length > 0 ? (
+                      <table className="table table-bordered">
+                        <thead>
+                          <tr>
+                            <th>Item</th>
+                            <th>Qty</th>
+                            <th>Weight</th>
+                            <th>Volume</th>
+                            <th>Notes</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {job.manifests.map((m) => (
+                            <tr key={m.id_manifest}>
+                              <td>{m.item_name}</td>
+                              <td>{m.quantity}</td>
+                              <td>{m.weight ?? "-"}</td>
+                              <td>{m.volume ?? "-"}</td>
+                              <td>{m.notes ?? "-"}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    ) : (
+                      <p className="text-muted">No manifests found.</p>
+                    )}
+                  </div>
+
+                  <hr />
                   {distanceData && (
                     <>
                       <hr />
@@ -122,143 +259,17 @@ export default function JobOrderDetailPage() {
                         </table>
                       </div>
                     </>
-                  )}
+                  )} 
 
-                  <hr />
 
-                  {/* Manifest Table */}
-                  <div className="mb-4">
-                    <h6>📋 Manifests</h6>
-                    {job.manifests.length > 0 ? (
-                      <table className="table table-bordered">
-                        <thead>
-                          <tr>
-                            <th>Item</th>
-                            <th>Qty</th>
-                            <th>Weight</th>
-                            <th>Volume</th>
-                            <th>Notes</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {job.manifests.map((m) => (
-                            <tr key={m.id_manifest}>
-                              <td>{m.item_name}</td>
-                              <td>{m.quantity}</td>
-                              <td>{m.weight ?? "-"}</td>
-                              <td>{m.volume ?? "-"}</td>
-                              <td>{m.notes ?? "-"}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    ) : (
-                      <p className="text-muted">No manifests found.</p>
-                    )}
-                  </div>
 
-                  <hr />
-
-                  {/* Location Table */}
-                  <div>
-                    <h6>📍 Locations</h6>
-                    {job.locations.length > 0 ? (
-                      <table className="table table-bordered">
-                        <thead>
-                          <tr>
-                            <th>Type</th>
-                            <th>Address</th>
-                            <th>Latitude</th>
-                            <th>Longitude</th>
-                            <th>Track</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {job.locations.map((loc) => (
-                            <tr key={loc.id_location}>
-                              <td>{loc.type}</td>
-                              <td>{loc.address}</td>
-                              <td>{loc.lat ?? "-"}</td>
-                              <td>{loc.lng ?? "-"}</td>
-                              <td>
-                                {loc.lat && loc.lng ? (
-                                  <a
-                                    href={`https://www.google.com/maps?q=${loc.lat},${loc.lng}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="btn btn-sm btn-primary"
-                                  >
-                                    Track via Map
-                                  </a>
-                                ) : (
-                                  <span className="text-muted">No coordinates</span>
-                                )}
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    ) : (
-                      <p className="text-muted">No locations found.</p>
-                    )}
-                  </div>
                 </>
-              )}
-
-              {selectedLoc && (
-                <div className="modal show d-block" style={{ background: "rgba(0,0,0,0.5)" }}>
-                  <div className="modal-dialog modal-lg">
-                    <div className="modal-content">
-                      <div className="modal-header">
-                        <h5 className="modal-title">Track Location</h5>
-                        <button
-                          type="button"
-                          className="btn-close"
-                          onClick={() => setSelectedLoc(null)}
-                        ></button>
-                      </div>
-                      <div className="modal-body">
-                        <iframe
-                          src={`https://www.google.com/maps?q=${selectedLoc.lat},${selectedLoc.lng}&z=15&output=embed`}
-                          width="100%"
-                          height="400"
-                          style={{ border: 0 }}
-                          allowFullScreen
-                        ></iframe>
-                      </div>
-                    </div>
-                  </div>
-                </div>
               )}
             </div>
           </div>
         </div>
 
-        {/* Styles */}
-        <style jsx>{`
-          .loading-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.8);
-            z-index: 10;
-          }
 
-          .spin {
-            animation: spin 1s linear infinite;
-          }
-
-          @keyframes spin {
-            0% {
-              transform: rotate(0deg);
-            }
-            100% {
-              transform: rotate(360deg);
-            }
-          }
-        `}</style>
       </div>
     </AdminLayout>
   );

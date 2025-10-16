@@ -69,14 +69,13 @@ export default function JobOrderTable() {
               <div className="row align-items-center">
                 <div className="col-md-12">
                   <ul className="breadcrumb">
-                    <li className="breadcrumb-item"><a href="">Home</a></li>
-                    <li className="breadcrumb-item"><a href="javascript: void(0)">Membership</a></li>
-                    <li className="breadcrumb-item" aria-current="page">Membership List</li>
+                    <li className="breadcrumb-item"><a>Home</a></li>
+                    <li className="breadcrumb-item" aria-current="page">Job Order</li>
                   </ul>
                 </div>
                 <div className="col-md-12">
                   <div className="page-header-title">
-                    <h2 className="mb-0">Membership List</h2>
+                    <h2 className="mb-0">Job Order</h2>
                   </div>
                 </div>
               </div>
