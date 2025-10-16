@@ -10,20 +10,7 @@ import React, {
 import { getCookie, setCookie, deleteCookie } from "cookies-next";
 import { useRouter } from "next/navigation";
 import { token } from "../lib/cookie";
-
-interface AuthUser {
-  username: string;
-  email: string;
-  token: string;
-  expired_at: string;
-}
-interface AuthContextType {
-  user: AuthUser | null;
-  loading: boolean;
-  login: (email: string, password: string) => Promise<AuthUser>;
-  logout: () => void;
-  checkToken: () => Promise<AuthUser>;
-}
+import { AuthContextType, AuthUser } from "../types";
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -63,7 +50,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
 
     const user: AuthUser = {
-      username: response.data.nama,
+      name: response.data.nama,
       email: response.data.email,
       token: response.data.token,
       expired_at: response.data.expired_at,
@@ -107,13 +94,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       });
 
       const data = await res.json();
-      console.log(data)
       if (!res.ok) {
         setUser(null);
         router.push("/login");
       }
-      setUser(data.data);
-      return data.data;
+
+      setUser(data.data.user);
+      return data.data.user;
     }catch(e){
       router.push("/login");
     }
