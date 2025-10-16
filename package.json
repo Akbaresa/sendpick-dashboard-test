@@ -9,8 +9,13 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@tabler/icons-react": "^3.35.0",
     "bootstrap": "^5.3.8",
     "cookies-next": "^6.1.0",
+    "datatables.net": "^2.3.4",
+    "datatables.net-dt": "^2.3.4",
+    "feather-icons": "^4.29.2",
+    "jquery": "^3.7.1",
     "js-cookie": "^3.0.5",
     "next": "15.5.5",
     "react": "19.1.0",
