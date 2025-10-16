@@ -1,9 +1,12 @@
 'use client';
-import { IconDashboard, IconFileText, IconLayout, IconSettings } from '@tabler/icons-react';
+import { useAuth } from '@/core/hooks/useAuth';
+import { AuthUser } from '@/core/types';
+import { User } from '@/core/types/user';
+import { IconLayout } from '@tabler/icons-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { JSX } from 'react';
+import { JSX, useEffect, useState } from 'react';
 
 interface MenuItemType {
   title: string;
@@ -14,17 +17,27 @@ interface MenuItemType {
 
 export default function SideBar() {
   const pathname = usePathname();
+  const { checkToken } = useAuth();
 
-const menuItems: MenuItemType[] = [
-  {
-    title: 'Dashboard',
-    href: '/dashboard',
-    icon: <IconDashboard size={20} />,
-  },
-  { title: 'Job Order', href: '/job-order', icon: <IconLayout size={20} /> },
-  { title: 'Documents', href: '/documents', icon: <IconFileText size={20} /> },
-  { title: 'Settings', href: '/settings', icon: <IconSettings size={20} /> },
-];
+  const [user, setUser] = useState<AuthUser | null>(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await checkToken();
+        setUser(response);
+      } catch (error) {
+        console.error("Error fetching user:", error);
+      }
+    };
+
+    fetchUser();
+  }, []);
+
+  const menuItems: MenuItemType[] = [
+    { title: 'Job Order', href: '/job-order', icon: <IconLayout size={20} /> },
+  ];
+
 
   return (
     <nav className="pc-sidebar">
@@ -43,7 +56,7 @@ const menuItems: MenuItemType[] = [
                   <Image width={42} height={42} src="/images/user/avatar-1.jpg" alt="user-image" className="user-avtar wid-45 rounded-circle" />
                 </div>
                 <div className="flex-grow-1 ms-3 me-2">
-                  <h6 className="mb-0" data-i18n="Jonh Smith">Jonh Smith</h6>
+                  <h6 className="mb-0" >{user?.name}</h6>
                   <small data-i18n="Administrator">Administrator</small>
                 </div>
                 <a className="btn btn-icon btn-link-secondary avtar" data-bs-toggle="collapse" href="#pc_sidebar_userlink">
@@ -57,7 +70,7 @@ const menuItems: MenuItemType[] = [
 
             <ul>
               {menuItems.map((menuItem) => {
-                const isActive = pathname === menuItem.href;
+                const isActive = pathname.startsWith(menuItem.href);
 
                 return (
                   <li

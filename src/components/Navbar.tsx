@@ -7,24 +7,14 @@ export default function NavbarPage(){
                 <div className="me-auto pc-mob-drp content-page">
                     <ul className="list-unstyled">
                         <li className="pc-h-item pc-sidebar-collapse">
-                        <a href="#" className="pc-head-link ms-0" id="sidebar-hide">
-                            <i className="ti ti-menu-2"></i>
-                        </a>
+                            <a href="#" className="pc-head-link ms-0" id="sidebar-hide">
+                                <i className="ti ti-menu-2"></i>
+                            </a>
                         </li>
                         <li className="pc-h-item pc-sidebar-popup">
-                        <a href="#" className="pc-head-link ms-0" id="mobile-collapse">
-                            <i className="ti ti-menu-2"></i>
-                        </a>
-                        </li>
-                        <li className="pc-h-item d-none d-md-inline-flex">
-                        <form className="form-search">
-                            <i className="search-icon">
-                            <svg className="pc-icon">
-                                <use href="#custom-search-normal-1"></use>
-                            </svg>
-                            </i>
-                            <input type="search" className="form-control" placeholder="Ctrl + K" />
-                        </form>
+                            <a href="#" className="pc-head-link ms-0" id="mobile-collapse">
+                                <i className="ti ti-menu-2"></i>
+                            </a>
                         </li>
                     </ul>
                 </div>
