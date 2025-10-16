@@ -20633,17 +20633,20 @@ pre[class*=language-] > code {
 }
 
 .pc-header {
+  position: fixed;
+  top: 0;
+  left: 0;       /* header full width */
+  right: 0;
+  min-height: 74px;
+  display: flex;
+  justify-content: space-between; /* kiri-kanan */
+  align-items: center;
+  padding: 0 1rem;
+  z-index: 1025;
   background: var(--pc-header-background);
   color: var(--pc-header-color);
-  min-height: 74px;
   box-shadow: var(--pc-header-shadow);
-  -webkit-backdrop-filter: blur(7px);
-          backdrop-filter: blur(7px);
-  position: fixed;
-  left: 280px;
-  right: 0;
-  z-index: 1025;
-  display: flex;
+  backdrop-filter: blur(7px);
 }
 .pc-header ul {
   margin-bottom: 0;
@@ -20659,8 +20662,12 @@ pre[class*=language-] > code {
 }
 .pc-header .header-wrapper {
   display: flex;
-  padding: 0 25px;
-  flex-grow: 1;
+  width: 100%;      /* penuh di header */
+  align-items: center;
+  justify-content: space-between; /* search kiri, profile kanan */
+  gap: 1rem;        /* jarak antar item */
+  padding: 0;        /* padding header sudah di .pc-header */
+  flex-grow: 0;      /* hapus flex-grow:1 supaya tidak terlalu melar */
 }
 @media (max-width: 575.98px) {
   .pc-header .header-wrapper {
@@ -21236,8 +21243,8 @@ pre[class*=language-] > code {
 .pc-container {
   position: relative;
   top: 74px;
-  margin-left: 280px;
-  min-height: calc(100vh - 135px);
+  margin-left: 0;
+  min-height: calc(100vh - 74px);
 }
 .pc-container .pc-content {
   padding-left: 40px;
