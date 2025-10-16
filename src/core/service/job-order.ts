@@ -1,4 +1,4 @@
-import { JobOrderDetail, JobOrderResponse } from '../types/job-order';
+import {  JobOrderDetail, JobOrderResponse } from '../types/job-order';
 import { token } from '../lib/cookie';
 import { ApiResponse } from '../types';
 
@@ -45,7 +45,6 @@ export const getJobOrders = async (params: GetJobOrdersParams = {}): Promise<Job
   return data;
 };
 
-
 export const getJobOrderDetail = async (
   id: number | string
 ): Promise<JobOrderDetail> => {
@@ -67,6 +66,6 @@ export const getJobOrderDetail = async (
     throw new Error(`Failed to fetch job order detail: ${text}`);
   }
 
-  const json: ApiResponse<JobOrderDetail> = await res.json();
+  const json = await res.json();
   return json.data;
 };
